@@ -22,7 +22,7 @@
 //    int int_position;
 //
 //    public GridViewAdapter(Context context, ArrayList<VideosModel> al_menu,int int_position) {
-//        super(context, R.layout.adapter_photosfolder, al_menu);
+//        super(context, R.layout.item_row, al_menu);
 //        this.al_menu = al_menu;
 //        this.context = context;
 //        this.int_position = int_position;
@@ -61,7 +61,7 @@
 //        if (convertView == null) {
 //
 //            viewHolder = new ViewHolder();
-//            convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_photosfolder, parent, false);
+//            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_row, parent, false);
 //            viewHolder.tv_foldern = (TextView) convertView.findViewById(R.id.tv_folder);
 //            viewHolder.tv_foldersize = (TextView) convertView.findViewById(R.id.tv_folder2);
 //            viewHolder.iv_image = (ImageView) convertView.findViewById(R.id.iv_image);

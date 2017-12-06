@@ -2,11 +2,13 @@ package galleryimages.galleryimages;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -30,7 +32,7 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         RecyclerView.ViewHolder viewHolder = null;
-        viewHolder = new DetailsRvAdapter.ViewHolder(layoutInflater.inflate(R.layout.adapter_photosfolder, parent, false));
+        viewHolder = new DetailsRvAdapter.ViewHolder(layoutInflater.inflate(R.layout.item_row, parent, false));
 
         return viewHolder;
     }
@@ -48,11 +50,13 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tv_foldern, tv_foldersize;
-        ImageView iv_image;
+        private RelativeLayout rlMain;
+        private TextView tv_foldern, tv_foldersize;
+        private ImageView iv_image;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            rlMain = (RelativeLayout) itemView.findViewById(R.id.rlMain);
             tv_foldern = (TextView) itemView.findViewById(R.id.tv_folder);
             tv_foldersize = (TextView) itemView.findViewById(R.id.tv_folder2);
             iv_image = (ImageView) itemView.findViewById(R.id.iv_image);
@@ -61,6 +65,13 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         private void setData(final Context context, final String path, DetailsRvAdapter.ViewHolder viewHolder) {
             tv_foldern.setVisibility(View.GONE);
             tv_foldersize.setVisibility(View.GONE);
+
+            rlMain.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
 
             Glide.with(context).load("file://" + path)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)

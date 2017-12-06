@@ -2,7 +2,6 @@ package galleryimages.galleryimages;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,16 +14,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = FolderRVAdapter.class.getSimpleName();
-    ArrayList<VideosModel> al_menu = new ArrayList<>();
-    int int_position;
-    Activity context;
+    private List<VideosModel> videoModelList = new ArrayList<>();
+    private Activity context;
 
-    public DetailsRvAdapter(Activity context, ArrayList<VideosModel> al_menu, int int_position) {
-        this.al_menu = al_menu;
-        this.int_position = int_position;
+    public DetailsRvAdapter(Activity context, List<VideosModel> videoModelList) {
+        this.videoModelList = videoModelList;
         this.context = context;
     }
 
@@ -40,31 +38,30 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         DetailsRvAdapter.ViewHolder viewHolder = (DetailsRvAdapter.ViewHolder) holder;
-//        VideosModel videosModel_ = al_menu.get(position);
-        viewHolder.setData(context, al_menu.get(int_position).getAl_imagepath().get(position), viewHolder);
+        viewHolder.setData(context, viewHolder, videoModelList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return al_menu.get(int_position).getAl_imagepath().size();
+        return videoModelList.size();
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
         private RelativeLayout rlMain;
-        private TextView tv_foldern, tv_foldersize;
-        private ImageView iv_image;
+        private TextView lblTitle, lblSize;
+        private ImageView imgPhoto;
 
         public ViewHolder(View itemView) {
             super(itemView);
             rlMain = (RelativeLayout) itemView.findViewById(R.id.rlMain);
-            tv_foldern = (TextView) itemView.findViewById(R.id.tv_folder);
-            tv_foldersize = (TextView) itemView.findViewById(R.id.tv_folder2);
-            iv_image = (ImageView) itemView.findViewById(R.id.iv_image);
+            lblTitle = (TextView) itemView.findViewById(R.id.lblTitle);
+            lblSize = (TextView) itemView.findViewById(R.id.lblSize);
+            imgPhoto = (ImageView) itemView.findViewById(R.id.imgPhoto);
         }
 
-        private void setData(final Context context, final String path, DetailsRvAdapter.ViewHolder viewHolder) {
-            tv_foldern.setVisibility(View.GONE);
-            tv_foldersize.setVisibility(View.GONE);
+        private void setData(final Context context, DetailsRvAdapter.ViewHolder viewHolder, final VideosModel videoModel) {
+            lblTitle.setText(""+videoModel.getFilePath().substring(videoModel.getFilePath().lastIndexOf("/")+1));
+            lblSize.setVisibility(View.GONE);
 
             rlMain.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -73,10 +70,10 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 }
             });
 
-            Glide.with(context).load("file://" + path)
+            Glide.with(context).load("file://" + videoModel.getFilePath())
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
-                    .into(viewHolder.iv_image);
+                    .into(viewHolder.imgPhoto);
         }
     }
 }

@@ -1,24 +1,24 @@
 package galleryimages.galleryimages;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 
-public class VideosModel {
-    String str_folder;
-    ArrayList<String> al_imagepath;
+public class VideosModel implements Serializable{
+    private String folderName;
+    private String filePath;
 
-    public String getStr_folder() {
-        return str_folder;
+    public String getFolderName() {
+        return folderName;
     }
 
-    public void setStr_folder(String str_folder) {
-        this.str_folder = str_folder;
+    public void setFolderName(String folderName) {
+        this.folderName = folderName;
     }
 
-    public ArrayList<String> getAl_imagepath() {
-        return al_imagepath;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setAl_imagepath(ArrayList<String> al_imagepath) {
-        this.al_imagepath = al_imagepath;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

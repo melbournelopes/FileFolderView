@@ -11,15 +11,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    public static ArrayList<VideosModel> al_images = new ArrayList<>();
-    boolean boolean_folder;
-    FolderRVAdapter obj_adapter;
-    RecyclerView rvFolder;
+    private Map<String, List<VideosModel>> videoModelMap = new HashMap<>();
+    private FolderRVAdapter obj_adapter;
+    private RecyclerView rvFolder;
     private static final int REQUEST_PERMISSIONS = 100;
 
     @Override
@@ -27,16 +30,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rvFolder = (RecyclerView)findViewById(R.id.rvFolder);
-
-//        rvFolder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
-//                intent.putExtra("value",i);
-//                startActivity(intent);
-//            }
-//        });
-
 
         if ((ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(getApplicationContext(),
@@ -52,14 +45,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }else {
             Log.e("Else","Else");
-            fn_imagespath();
+            fetchVideos();
         }
     }
 
-    public ArrayList<VideosModel> fn_imagespath() {
-        al_images.clear();
-
-        int int_position = 0;
+    public void fetchVideos() {
         Uri uri;
         Cursor cursor;
         int column_index_data, column_index_folder_name;
@@ -67,10 +57,17 @@ public class MainActivity extends AppCompatActivity {
         String absolutePathOfImage = null;
         uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
-        String[] projection = {MediaStore.MediaColumns.DATA, MediaStore.Video.Media.BUCKET_DISPLAY_NAME};
+        String[] projection = {
+                MediaStore.Video.VideoColumns._ID,
+                MediaStore.Video.VideoColumns.DATA,
+                MediaStore.Video.VideoColumns.TITLE,
+                MediaStore.Video.VideoColumns.DURATION,
+                MediaStore.Video.VideoColumns.DATE_ADDED,
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME
+        };
 
         final String orderBy = MediaStore.Images.Media.DATE_TAKEN;
-        cursor = getApplicationContext().getContentResolver().query(uri, projection, null, null, orderBy + " DESC");
+        cursor = getContentResolver().query(uri, projection, null, null, orderBy + " DESC");
 
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
@@ -78,46 +75,27 @@ public class MainActivity extends AppCompatActivity {
             absolutePathOfImage = cursor.getString(column_index_data);
             Log.e("Column", absolutePathOfImage);
             Log.e("Folder", cursor.getString(column_index_folder_name));
-
-            for (int i = 0; i < al_images.size(); i++) {
-                if (al_images.get(i).getStr_folder().equals(cursor.getString(column_index_folder_name))) {
-                    boolean_folder = true;
-                    int_position = i;
-                    break;
-                } else {
-                    boolean_folder = false;
-                }
+            String folderName = cursor.getString(column_index_folder_name);
+            String filePath = absolutePathOfImage;
+            List<VideosModel> videoModelList = videoModelMap.get(folderName);
+            if (videoModelList == null) {
+                videoModelList = new ArrayList<>();
+                videoModelMap.put(folderName, videoModelList);
             }
-
-            if (boolean_folder) {
-
-                ArrayList<String> al_path = new ArrayList<>();
-                al_path.addAll(al_images.get(int_position).getAl_imagepath());
-                al_path.add(absolutePathOfImage);
-                al_images.get(int_position).setAl_imagepath(al_path);
-
-            } else {
-                ArrayList<String> al_path = new ArrayList<>();
-                al_path.add(absolutePathOfImage);
-                VideosModel obj_model = new VideosModel();
-                obj_model.setStr_folder(cursor.getString(column_index_folder_name));
-                obj_model.setAl_imagepath(al_path);
-
-                al_images.add(obj_model);
-            }
-
+            VideosModel videoModel = new VideosModel();
+            videoModel.setFolderName(folderName);
+            videoModel.setFilePath(filePath);
+            videoModelList.add(videoModel);
         }
 
-
-        for (int i = 0; i < al_images.size(); i++) {
-            Log.e("FOLDER", al_images.get(i).getStr_folder());
-            for (int j = 0; j < al_images.get(i).getAl_imagepath().size(); j++) {
-                Log.e("FILE", al_images.get(i).getAl_imagepath().get(j));
-            }
+        if(!videoModelMap.isEmpty()){
+            obj_adapter = new FolderRVAdapter(this, videoModelMap);
+            rvFolder.setAdapter(obj_adapter);
+        }else{
+//            tvNoItemFound.setVisibility(View.VISIBLE);
+//            tvNoItemFound.setText(FragmentUtil.getString(this,R.string.no_videos_found_device_msg));
+//            recyclerView.setVisibility(View.GONE);
         }
-        obj_adapter = new FolderRVAdapter(this, al_images);
-        rvFolder.setAdapter(obj_adapter);
-        return al_images;
     }
 
     @Override
@@ -128,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_PERMISSIONS: {
                 for (int i = 0; i < grantResults.length; i++) {
                     if (grantResults.length > 0 && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                        fn_imagespath();
+                        fetchVideos();
                     } else {
                         Toast.makeText(MainActivity.this, "The app was not allowed to read or write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
                     }

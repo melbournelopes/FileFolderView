@@ -49,7 +49,7 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private static class ViewHolder extends RecyclerView.ViewHolder {
         private RelativeLayout rlMain;
         private TextView lblTitle, lblSize;
-        private ImageView imgPhoto;
+        private ImageView imgPhoto, imgRightArrow;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -57,11 +57,13 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             lblTitle = (TextView) itemView.findViewById(R.id.lblTitle);
             lblSize = (TextView) itemView.findViewById(R.id.lblSize);
             imgPhoto = (ImageView) itemView.findViewById(R.id.imgPhoto);
+            imgRightArrow = (ImageView) itemView.findViewById(R.id.imgRightArrow);
         }
 
         private void setData(final Context context, DetailsRvAdapter.ViewHolder viewHolder, final VideosModel videoModel) {
             lblTitle.setText(""+videoModel.getFilePath().substring(videoModel.getFilePath().lastIndexOf("/")+1));
             lblSize.setVisibility(View.GONE);
+            imgRightArrow.setVisibility(View.GONE);
 
             rlMain.setOnClickListener(new View.OnClickListener() {
                 @Override

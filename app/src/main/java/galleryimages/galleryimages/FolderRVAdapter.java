@@ -13,11 +13,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,14 +24,13 @@ import java.util.Map;
 
 public class FolderRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = FolderRVAdapter.class.getSimpleName();
-    private Map<String, List<VideosModel>> videoModelMap = new HashMap<>();
+    private Map<String, List<VideosModel>> videoModelMap;
     private List<String> keyList;
     Activity context;
 
-    public FolderRVAdapter(Activity context, Map<String, List<VideosModel>> videoModelMap) {
-        this.videoModelMap = videoModelMap;
+    public FolderRVAdapter(Activity context, List<String> keyList) {
         this.context = context;
-        keyList = new ArrayList<String>(videoModelMap.keySet());
+        this.keyList = keyList;
     }
 
     @Override
@@ -55,6 +51,7 @@ public class FolderRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ViewHolder viewHolder = (ViewHolder) holder;
         String folderName = keyList.get(position);
+
         viewHolder.setData(context, videoModelMap.get(folderName), folderName, viewHolder, position);
     }
 
@@ -63,7 +60,12 @@ public class FolderRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return keyList.size();
     }
 
-    private static class ViewHolder extends RecyclerView.ViewHolder {
+    public void setItemList(Map<String, List<VideosModel>> videoModelMap) {
+        this.videoModelMap = videoModelMap;
+        notifyItemInserted(videoModelMap.size() - 1);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private RelativeLayout rlMain;
         private TextView lblTitle, lblSize;
         private ImageView imgPhoto;
@@ -91,9 +93,16 @@ public class FolderRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
 
             Glide.with(context).load("file://" + videoModelList.get(0).getFilePath())
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
                     .into(viewHolder.imgPhoto);
+        }
+
+        public void updateVideoCount(Activity context, List<VideosModel> videoModelList){
+
+            if(imgPhoto.getDrawable() == null){
+                Glide.with(context).load("file://" + videoModelList.get(0).getFilePath())
+                        .into(imgPhoto);
+            }
+            lblSize.setText(videoModelList.size() + " Items");
         }
     }
 }

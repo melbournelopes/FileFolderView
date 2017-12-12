@@ -11,7 +11,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +72,6 @@ public class DetailsRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             });
 
             Glide.with(context).load("file://" + videoModel.getFilePath())
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
                     .into(viewHolder.imgPhoto);
         }
     }
